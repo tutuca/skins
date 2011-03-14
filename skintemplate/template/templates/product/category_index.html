@@ -1,0 +1,14 @@
+{% extends "shop/base.html" %}
+{% load i18n thumbnail satchmo_util %}
+{% block title %}
+    {% blocktrans with %}Showing {{product.translated_name}} {% endblocktrans %}
+{% endblock %}
+{% block content %}
+<h1 class="title_prod">{% trans "Categories" %}</h1>
+<div id="boxes">
+  {% include 'product/snippet.html' %}
+  {% for category in categorylist %}
+    {% include 'category/snippet.html' %}
+  {% endfor %}
+</div>
+{% endblock %}

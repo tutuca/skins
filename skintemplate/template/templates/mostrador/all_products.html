@@ -1,0 +1,38 @@
+{% extends "shop/base.html" %}
+{% load i18n thumbnail satchmo_price satchmo_currency satchmo_category pagination_tags %}
+{% load satchmo_util satchmo_discounts app_plugins %}
+{% block title %}
+{% trans 'All products' %}
+{% endblock %}
+
+{% block topcontent %}
+<div id="sub-banner-wrapper">
+    <div id="sub-banner">
+        <div id="home-banner-content">
+            <h2 class="title">{% trans 'All products'%}</h2>
+            <ul class="breadcrumb">
+                <li><a title="{% trans 'Home' %}" href="/">{% trans 'Home' %}</a></li>
+                <li class="no-arrow"><a title="" href="">{% trans 'All products'%}</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock topcontent %}
+
+{% block content %}
+    <h2 class="title">{% trans 'All products'%}</h2>
+    {% autopaginate products 12 %}
+    <table border="0" cellpadding="0" cellspacing="0">
+    <tbody>
+        <tr class="col1">
+    {% for product in products %}
+        <td class="{% cycle 'col1' 'col2' 'col3' 'col4' %}">
+        {% include 'product/snippet.html' %}
+        </td>
+        {% if forloop.counter|divisibleby:4 and not forloop.last %}</tr><tr class="col{{forloop.counter}}">{% endif %}
+    {% endfor %}
+        </tr>
+    </tbody>
+    </table>
+    {% paginate %}
+{% endblock %}

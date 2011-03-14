@@ -1,0 +1,92 @@
+{% extends "shop/base.html" %}
+{% comment %}
+{% endcomment %}
+{% load i18n thumbnail app_plugins %}
+{% load satchmo_util satchmo_discounts satchmo_price satchmo_currency satchmo_category %}
+{% block title %} 
+{% blocktrans with product.name as product_name%} Buy {{product_name}} at {% endblocktrans %}
+{% endblock %}
+{% block extra-head %}
+{% if product.meta %}
+    <meta name="description" content="{{product.meta}}">
+{% else %}
+    <meta name="description" content="{{product.description}}">
+{% endif %}
+{% endblock %}
+
+{% block javascript %}
+{% endblock %}
+
+{% block js_onload %}
+{% endblock js_onload%}
+
+{% block content %}
+<div id="breadcrumb">
+<h3>{% trans 'You are here:' %}</h3>
+<ul>
+    <li><a href="{{ shop_base }}/">{% trans "Home" %}</a></li>
+    {% for name, url in product.category.all.0.get_url_name %}
+        <li><a href="{{ url }}">{{ name }}</a></li>
+    {% endfor %}
+    <li class="no-arrow">{{ product.translated_name }}</li>
+</ul>
+</div>
+<br class="clear" />
+<div id="product-photos">
+    <ul>
+    {% for pic in product.productimage_set.all %}
+      {% if forloop.first %}
+          {% thumbnail pic.picture 240x240 crop as image %}
+      {% else %}
+          {% thumbnail pic.picture 100x100 crop as image %}
+      {% endif %}
+      <li>
+        <a class="image" href="{{pic.picture.url}}">
+            <img src="{{image.url}}" alt="{{pic}}" title="{{pic}}" />
+        </a>
+      </li>
+    {% empty %}
+        <li></li>
+    {% endfor %}
+    </ul>
+</div>
+
+<div id="product-description">
+    <h1 class="title_prod">{{ product.translated_name }}</h1>
+
+    <form method="post" action="{% url satchmo_smart_add %}">
+    <div class="dotted-divider"></div>
+        <div class="current-price">
+            <div class="variant-price price">
+            <div class="price-field">{{ product|discount_price:""|currency }}</div>
+          </div>
+    </div>
+    <input type="hidden" name="productname" value="{{product.slug}}" />
+    <input type="submit" id="purchase" value="{% trans 'Add to Shopping Cart' %}" name="add" class="large button main"/>
+    <input type="hidden" size="2" name="quantity" id="quantity" value="1" class="priced" />
+    {% plugin_point "product_add_buttons" %}
+    {% plugin_point "product_form" %}
+    </form>
+
+    <div style="clear: both;"></div>
+    <p></p>
+    <div class="clear">{{ product.description|safe }}</div>
+    <div class="dotted-divider"></div>
+    <p>{% trans 'Good luck with your shop!' %}</p>
+    <div class="social-links left">
+        <div class="facebook-like left">
+            <script src="http://connect.facebook.net/{% trans 'es_ES' %}/all.js#xfbml=1"></script><fb:like href="{{request.build_absolute_uri}}" layout="button_count" show_faces="false" width="200"></fb:like>
+        </div>
+        <div class="twitter-like left">
+            <a href="http://twitter.com/share" class="twitter-share-button" data-text="{% trans 'Me gusta!' %}" data-count="none" data-lang="{% trans 'es' %}">Tweet</a><script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
+        </div>
+    </div>
+
+</div>
+
+{% block productfooter %}
+{% if sale %}{% include "product/product_discount_eligible.html" %}{% endif %}
+{% plugin_point "product_footer" %}
+{% endblock %}
+
+{% endblock %}

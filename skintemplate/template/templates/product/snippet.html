@@ -1,0 +1,27 @@
+{% load i18n thumbnail satchmo_util satchmo_price satchmo_currency satchmo_discounts%}
+  <div class="box">
+      <div class="product-thumbnail">
+        {% if product.main_image %}
+            {% thumbnail product.main_image.picture 80x80 crop as image %}
+            <a href="{{ product.get_absolute_url }}">
+            {% if image.url %}
+                <img src="{{ image.url }}" alt="{% trans 'picture of' %} {{product.name}}"
+                     width="{{ image.width }}" height="{{ image.height }}" />
+            {% else %}
+                <img src="{{ MEDIA_URL }}img-tmp/default-product-image.png" }}" 
+                     alt="{% trans 'picture of' %} {{product.name}}"/>
+            {% endif %}
+            </a>
+        {% endif %}     
+        </div>
+        <div class="details">
+            <h1><a href="{{ product.get_absolute_url }}">{{ product.translated_name }}</a></h1>
+            <h3 class="price">{{ product|discount_price:sale|currency }}</h3>
+            <form action="{% url satchmo_smart_add %}" method="post" >
+              <input type="hidden" name="productname" value="{{product.slug}}" />
+              <input type="hidden" name="quantity" id="quantity" value="1" /></h3>
+              <a class="submit" href="#" />Agregar al carrito</a>
+            </form>
+        </div>
+
+  </div>

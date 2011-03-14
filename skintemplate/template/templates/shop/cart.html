@@ -1,0 +1,125 @@
+{% extends "shop/base.html" %}
+{% load i18n thumbnail satchmo_cart satchmo_currency satchmo_util satchmo_product satchmo_discounts normalize_decimal %}
+{% block title %}
+{% trans 'Shopping Cart' %}
+{% endblock %}
+
+{% block js_onload %}
+$("#update-cart").click(function(){});
+$('input.quantity').keyup(function(){
+    var item = $(this).attr('id').replace('quantity-','');
+    var quantity =  $(this).attr('value');
+    $('#total-'+item).addClass('img-loading');
+
+    $.ajax({
+        type: 'POST',
+        dataType: 'json',
+        cache: false,
+        data: ({'cartitem': item,
+                'quantity': quantity}),
+        url: '{% url satchmo_cart_set_qty %}',
+        success: function(data){
+            $('#errors-'+item).text('');
+            $('#total-'+item).text(parseFloat(data['item_price']).toFixed(2));
+            $('.cart-total').text('{% trans 'Cart Total:' %} '+parseFloat(data['cart_total']).toFixed(2));
+            $('#total-'+item).removeClass('img-loading');
+        },
+        error: function(xhr, error, data){
+            $('#errors-'+item).text(error);
+            $('#total-'+item).removeClass('img-loading');
+        }
+    });
+});
+{% endblock js_onload%}
+
+{% block topcontent %}
+<div id="sub-banner-wrapper">
+    <div id="sub-banner">
+        <div id="home-banner-content">
+            <h2 class="title">{% trans 'Shopping Cart' %}</h2>
+            <ul class="breadcrumb">
+                <li><a href="{{ shop_base }}/">{% trans "Home" %}</a></li>
+                <li class="no-arrow">{% trans 'Cart' %}</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock topcontent %}
+
+{% block content %}
+<div id="full-width">
+<div id="cart">
+{% if error_message %}
+<div class="error">{{ error_message }}</div>
+{% endif %}
+{% if cart.is_empty %}
+    <h2 class="title">{% trans "Your cart is empty." %}</h1>
+{% else %}
+    <h2 class="title">{% trans "Your Cart" %}</h2>
+<form name="cartform" method="post" action=".">
+    <!-- begin table -->
+    <table cellspacing="0" cellpadding="0">
+        
+        <!-- begin headers -->
+        <tbody><tr>
+            <th class="start" colspan="2">{% trans 'Description' %}</th>
+            <th>{% trans 'Price' %}</th>
+            <th>{% trans 'Quantity' %}</th>
+            <th>{% trans 'Delete' %}</th>
+            <th>{% trans 'Total' %}</th>
+        </tr>
+        <!-- end headers -->
+        {% for cartitem in cart %}
+        <!-- start product 1 -->
+        <tr class="odd">
+            {% thumbnail cartitem.product.main_image.picture 50x50 as image %}
+             <td class="pic">
+                <div><a href="{{ cartitem.product.get_absolute_url }}"><img alt="{{cartitem.product.translated_name}}" src="{{image.url}}"></a></div>
+            </td>
+            <td class="title">
+                <h3 class="title"><a href="{{ cartitem.product.get_absolute_url }}">{{cartitem.product.translated_name}}</a></h3>
+            </td>
+            <td>{{ cartitem.product|discount_price:sale|currency }}</td>
+            <td class="cant">
+                <p id="errors-{{ cartitem.id }}" class="error"></p>
+                <input type="text" name="quantity-{{ cartitem.id }}" class="quantity" size="2" id="quantity-{{ cartitem.id }}" value="{{ cartitem.quantity|normalize_decimal }}" />
+            </td>
+            <td class="remove">
+                <form action="{% url satchmo_cart_remove %}" method="post">
+                    <input type="hidden" name="cartitem" value="{{ cartitem.id }}" />
+                    <input type="submit" value="{% trans 'Remove' %}" class="flat"/>
+                </form>
+            </td>
+            <td><strong id="total-{{ cartitem.id }}">{{ cartitem|discount_line_total:sale|currency }}</strong></td>
+        </tr>
+        {% endfor %}
+        <!-- End product 1 -->
+    
+    </tbody></table>
+    <!-- end table -->
+    
+    <!-- start complete -->
+    <div class="clear" id="complete">
+        
+        <!-- start total -->
+        <div id="total">
+            <p class="cart-total">{% trans 'Cart Total:' %} <span>{{ cart|discount_cart_total:sale|currency }}</span></p><div style="clear: both;"></div>
+            
+            <!-- start checkout -->
+            <div class="clear" id="checkout">
+                <a class="large button secondary" id="update-cart" href="{{request.path}}#">{% trans 'Update' %}</a>
+                <a class="large button main" href="{% url satchmo_checkout-step1 %}">{% trans 'Checkout' %}</a>
+            </div>
+            <!-- end checkout -->
+            
+        </div>
+        <!-- end total -->
+        
+    </div>
+    <!-- end complete-->
+    
+</form>
+</div>
+</div>
+{% endif %}
+{% endblock %}

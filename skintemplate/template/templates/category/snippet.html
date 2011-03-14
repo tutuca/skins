@@ -1,0 +1,19 @@
+{% load i18n thumbnail %}
+{% load i18n thumbnail satchmo_util satchmo_price satchmo_currency satchmo_discounts%}
+<ul class="featured-product">
+    <li>
+        <a href="{{ category.get_absolute_url }}">
+            {% thumbnail category.product_set.all.0.main_image.picture 240x240 crop as image %}
+            {% if image.url %}
+            <img src="{{ image.url }}" alt="{% trans 'picture of' %} {{product.name}}"
+                   width="{{ image.width }}" height="{{ image.height }}" />
+            {% else %}
+            <img src="{{ MEDIA_URL }}img-tmp/default-product-image.png" }}" 
+                alt="{% trans 'picture of' %} {{product.name}}"/>
+            {% endif %}
+            <span class="product-name">{{ category.translated_name }}</span>
+            <br><span class="small button details">DETAILS</span>
+        </a>
+    </li>
+</ul>
+

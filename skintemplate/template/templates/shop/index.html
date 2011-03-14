@@ -1,0 +1,38 @@
+{% extends "shop/base.html" %}
+{% load i18n pagination_tags %}
+{% block title %}
+{% trans 'Welcome to ' %}
+{% endblock %}
+{% block content %}
+{% with all_products_list as products %}
+    {% include 'widgets/easyslider_product.html' %}
+{% endwith %}
+{% endblock %}
+
+{% block contentslot %}
+{% if not is_paginated and not all_products_list %}
+<!-- no featured products-->
+{% with kiosko.get_all_products as products%}
+    {% autopaginate products 9 %}
+  <h2 class="title_prod">{% trans "All products" %}</h2>
+    <div id="boxes">
+    {% for product in products %} 
+        {% include 'product/snippet.html' %}
+    {% endfor %}
+    </div>
+    {% paginate %}
+{% endwith %}
+{% else %}
+<!--  featured products-->
+  <h1 class="title_prod">{% trans "Featured Items" %}</h1>
+    <div id="boxes">
+    {% for product in all_products_list %}
+        {% include 'product/snippet.html' %}
+    {% endfor %}
+    </div>
+{% if is_paginated %}
+    {% include 'pagination/satchmo_pagination.html'%}
+{%endif%}
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,58 @@
+{% extends "shop/base.html" %}
+{% load i18n %}
+{% load satchmo_currency satchmo_discounts thumbnail %}
+
+{% block topcontent %}
+<div id="sub-banner-wrapper">
+    <div id="sub-banner">
+        <div id="home-banner-content">
+            <h2 class="title">{% trans 'Search results'%}</h2>
+            <ul class="breadcrumb">
+                <li><a href="{{ shop_base }}/">{% trans "Home" %}</a></li>
+                <li class="no-arrow">{% trans 'Search' %}</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock topcontent %}
+
+{% block content %}
+{% if not results.categories and not results.products %}
+<h2 class="title" >{% trans "Nothing found" %}</h2>
+{% else %}
+    {% if results.categories %}
+        <h2 class="title" >{% trans "Categories" %}</h4>
+        <table border="0" cellpadding="0" cellspacing="0">
+        <tbody>
+            <tr class="col1">
+            {% for category in results.categories %}
+            <td class="{% cycle 'col1' 'col2' 'col3' 'col4' %}">
+                {% include 'category/snippet.html' %}
+            </td>
+            {% if forloop.counter|divisibleby:4 and not forloop.last %}</tr><tr class="col{{forloop.counter}}">{% endif %}
+            {% endfor %}
+            </tr>
+        </tbody>
+        </table>
+    {% endif %}
+    {% if results.products %}
+        {% if results.categories %}
+            <h3></h3>
+        {% endif %}
+        <h2 class="title" >{% trans "Products" %}</h2>
+        <table border="0" cellpadding="0" cellspacing="0">
+        <tbody>
+            <tr class="col1">
+        {% for product in results.products %}
+            <td class="{% cycle 'col1' 'col2' 'col3' 'col4' %}">
+            {% include 'product/snippet.html' %}
+            </td>
+            {% if forloop.counter|divisibleby:4 and not forloop.last %}</tr><tr class="col{{forloop.counter}}">{% endif %}
+        {% endfor %}
+            </tr>
+        </tbody>
+        </table>
+        </div>
+    {% endif %}
+{% endif %}
+{% endblock %}

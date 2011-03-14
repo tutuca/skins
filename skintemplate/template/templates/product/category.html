@@ -1,0 +1,47 @@
+{% extends "shop/base.html" %}
+{% load i18n thumbnail satchmo_price satchmo_currency satchmo_category pagination_tags %}
+{% load satchmo_util satchmo_discounts app_plugins %}
+{% block title %}{% blocktrans with category.translated_name as cat_name %} Products in {{cat_name}} 
+{% endblocktrans %}
+{% endblock %}
+{% block extra-head %}
+{% if category.meta %}
+    <meta name="description" content="{{ category.meta|escape }}">
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<div id="breadcrumb">
+<h3>{% trans 'You are here:' %}</h3>
+<ul>
+    <li><a href="{{ shop_base }}/">{% trans "Home" %}</a></li>
+    <li class="no-arrow">{{ category.translated_name }}</li>
+</ul>
+</div>
+<br class="clear" />
+<h1 class="title_prod">{% blocktrans with category.translated_name as cat_name %}
+Products in {{cat_name}} 
+{% endblocktrans %}</h1>
+{% if category.description %}<p class="product_category_description">{{ category.description|safe }}</p>{% endif %}
+    {% autopaginate products 9 %}
+    <div class="boxes">
+    {% for product in products %}
+        {% include 'product/snippet.html' %}    
+    {% endfor %}
+    </div>
+    {% paginate%}
+{% if child_categories %}
+        {% for cat in child_categories %}
+            <h4>{{cat.translated_name}}</h4>
+            {% if cat.description %}<p class="product_category_description">{{ cat.description }}</p>{% endif %}
+            <div class="boxes">
+            {% for product in cat.active_products %}
+                    {% include 'product/snippet.html' %}    
+            {% endfor %}
+            </div>
+        {% endfor %}
+{% endif %}
+{% if sale %}
+{% include "product/some_discount_eligible.html" %}
+{% endif %}
+{% endblock %}
